@@ -79,19 +79,14 @@ def get_process_sample(
         kwargs.get("capture_output", False)
         or {"stdout", "stderr", "capture_output"}.intersection(set(kwargs)) == set()
     ):
-        kwargs["stdout"] = subprocess.PIPE
-        kwargs["stderr"] = subprocess.PIPE
-
-    # Keeps python 3.6 compatibility
-    if "capture_output" in kwargs:
-        del kwargs["capture_output"]
+        kwargs["capture_output"] = True
 
     while tries <= retries:
         tries += 1
         logger.debug(f"On try {tries}")
 
         attempt = ProcessRun()
-        start_time = datetime.datetime.utcnow()
+        start_time = datetime.datetime.now(datetime.timezone.utc)
         try:
             proc = subprocess.run(cmd, check=False, timeout=timeout, **kwargs)
         except subprocess.TimeoutExpired as timeout_error:
@@ -100,7 +95,7 @@ def get_process_sample(
             stdout = timeout_error.stdout
             stderr = timeout_error.stderr
         else:
-            attempt.time_seconds = (datetime.datetime.utcnow() - start_time).total_seconds()
+            attempt.time_seconds = (datetime.datetime.now(datetime.timezone.utc) - start_time).total_seconds()
             attempt.hit_timeout = False
             attempt.rc = proc.returncode
             stdout = proc.stdout
