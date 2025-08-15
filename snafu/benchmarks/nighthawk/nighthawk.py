@@ -7,6 +7,7 @@ import os
 import socket
 import subprocess
 from typing import Any, Dict, Iterable, List, Optional
+
 from snafu.benchmarks import Benchmark, BenchmarkResult
 from snafu.config import Config, ConfigArgument
 
